@@ -15,6 +15,19 @@ FRICTION_CONSTANT = 0.8
 # Aceleración
 # 1940 cv --> 0 a 100 en 1.85 s
 
+class Sprite:
+    def __init__(self, bank, start_coords, end_coords, col):
+        self.start_coords = start_coords
+        self.avanced = (
+            end_coords[0] - self.start_coords[0],
+            end_coords[1] - self.start_coords[1]
+        )
+        self.bank = bank
+        self.col = col
+    
+    def draw(self, x, y):
+        pyxel.blt(x, y, self.bank, self.start_coords[0], self.start_coords[1], self.avanced[0], self.avanced[1], colkey = self.col)
+
 class Car:
     def __init__(self, coords):
        self.x = coords[0]
@@ -22,37 +35,93 @@ class Car:
        self.vel = 0
        self.angle = math.pi/2
        self.ac = 0
+       self.sprites = {
+            'UP':(
+                Sprite(0, (106, 40), (118, 58), 0), 
+                (6, 6)
+            ), 
+            'DOWN':(
+               Sprite(0, (234, 39), (246, 59), 0),
+               (6, 9)
+            ),
+            'RIGHT':(
+                Sprite(0, (162, 42), (190, 56), 0),
+                (12, 5)
+            ), 
+           'LEFT':(
+               Sprite(0, (34, 42), (62, 55), 0) , 
+               (12, 5)
+            ),
+            'UP_RIGHT':(
+               Sprite(0, (130, 39), (157, 58), 0) , 
+               (13, 6)
+            ),
+            'UP_LEFT':(
+               Sprite(0, (67, 40), (93, 58), 0) , 
+               (12, 5)
+            ),
+            'DOWN_RIGHT':(
+               Sprite(0, (195, 39), (222, 58), 0) , 
+               (12, 5)
+            ),
+            'DOWN_LEFT':(
+               Sprite(0, (2, 39), (29, 58), 0) , 
+               (14, 7)
+            )
+       }
 
     def update(self):
         if pyxel.btn(pyxel.KEY_UP):
             self.ac = 5/60
         elif pyxel.btn(pyxel.KEY_DOWN):
-            self.ac = -5/60
+            self.ac = -6/60
         else:
-            self.ac += 1/60 * (-1 if self.vel > 0 else 1)
+            if self.vel != 0:
+                self.ac = 3/60 * (-1 if self.vel > 0 else 1)
         
         if not int( self.vel ) == 0:
             if pyxel.btn(pyxel.KEY_RIGHT):
                 self.angle -= 0.3/self.vel
             elif pyxel.btn(pyxel.KEY_LEFT):
                 self.angle += 0.3/self.vel
-        
+
+        self.vel += self.ac
+        self.angle %= 2*math.pi
+
         if abs( self.vel ) < 0.01:
             self.vel = 0
 
-        self.vel += self.ac
-        print(self.vel)
         self.x += 0.1*self.vel*math.cos(self.angle)
         self.y -= 0.1*self.vel*math.sin(self.angle)
 
     def draw(self):
-        pyxel.circ(self.x, self.y, 3, 7)
+        to_draw = None
+        
+        if (self.angle <= math.pi/8) or (self.angle >= math.pi*15/8):
+            to_draw = 'RIGHT'
+        elif (self.angle >= math.pi*13/8):
+            to_draw = 'DOWN_RIGHT'
+        elif (self.angle >= math.pi*11/8):
+            to_draw = 'DOWN'
+        elif (self.angle >= math.pi*9/8):
+            to_draw = 'DOWN_LEFT'
+        elif (self.angle >= math.pi*7/8):
+            to_draw = 'LEFT'
+        elif (self.angle >= math.pi*5/8):
+            to_draw = 'UP_LEFT'
+        elif (self.angle >= math.pi*3/8):
+            to_draw = 'UP'
+        else:
+            to_draw = 'UP_RIGHT'
+
+        self.sprites[to_draw][0].draw(self.x - self.sprites[to_draw][1][0], self.y- self.sprites[to_draw][1][1])
 
 class App:
     def __init__(self):
         self.car = Car((WIDTH/2, HEIGHT/2))
 
         pyxel.init(WIDTH, HEIGHT, caption='Gran Rutismo', fps=60)
+        pyxel.load("./my_resource.pyxres")
         pyxel.run(self.update, self.draw)
     
     def update(self):
