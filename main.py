@@ -78,13 +78,13 @@ class Car:
 
         if pyxel.btn(pyxel.KEY_UP) and self.fuel > 0:
             self.ac = (10/12000 * abs(210 - self.vel))
-            self.fuel -= abs( self.vel*0.1*4.1/100 )
+            self.fuel -= abs( 0.1*self.waste_each_100/100/(self.vel/10 if self.vel > 0 else 1) )
         elif pyxel.btn(pyxel.KEY_DOWN):
             if int(self.vel) > 0:
                 self.ac = -30/60
             elif self.fuel > 0:
                 self.ac = -30/60
-                self.fuel -= abs( self.vel*0.1*4.1/100 )
+                self.fuel -= abs( 0.1*self.waste_each_100/100/(self.vel/10 if self.vel > 0 else 1) )
             else:
                 self.ac = 0
         elif self.vel != 0:
@@ -141,13 +141,29 @@ class Car:
 class HUD:
     def draw(self, car):
         VEL_POS = (40, 200)
+        GAS_POS = (90, 200)
+
+        pyxel.circ(GAS_POS[0], GAS_POS[1], 15, 0)
+        pyxel.circb(GAS_POS[0], GAS_POS[1], 16, 7)
+
+        angle_gas = -math.pi*7/8+(6/320*math.pi*car.fuel)
+        pyxel.line(GAS_POS[0], GAS_POS[1], GAS_POS[0] + 8*math.cos(angle_gas), GAS_POS[1] + 8*math.sin(angle_gas), 9)
+        pyxel.text(GAS_POS[0]+10, GAS_POS[1]-7, "F", 7)
+        pyxel.text(GAS_POS[0]-12, GAS_POS[1]-7, "E", 7)
+
+        if car.fuel <= 5 and car.fuel > 0:
+            if int(pyxel.frame_count/10)%8 < 4:
+                Sprite(1, (0, 0), (15, 15), 0).draw(GAS_POS[0]-8, GAS_POS[1]-17)
+        elif car.fuel == 0:
+            Sprite(1, (0, 0), (15, 15), 0).draw(GAS_POS[0]-8, GAS_POS[1]-17)
+
         pyxel.circ(VEL_POS[0], VEL_POS[1], 30, 0)
         pyxel.circb(VEL_POS[0], VEL_POS[1], 31, 7)
         if (car.vel >= 0) or ( abs(car.vel) < 1 ):
-            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+(math.pi/200*car.vel)), 8)
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+0.1+(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+(math.pi/200*car.vel)), 8)
         else:
-            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+abs(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+abs(math.pi/200*car.vel)), 8)
-            pyxel.text(VEL_POS[0]+10, VEL_POS[1] - 20, "R", 8)
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+0.1+abs(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+abs(math.pi/200*car.vel)), 8)
+            pyxel.text(VEL_POS[0]+13, VEL_POS[1] - 23, "R", 8)
 
 class BackGround:
     def __init__(self):
