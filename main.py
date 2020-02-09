@@ -72,12 +72,12 @@ class Car:
 
     def update(self):
         if pyxel.btn(pyxel.KEY_UP):
-            self.ac = 5/60
+            self.ac = 10/12000 * abs(210 - self.vel)
         elif pyxel.btn(pyxel.KEY_DOWN):
-            self.ac = -6/60
+            self.ac = -30/60
         else:
             if self.vel != 0:
-                self.ac = 3/60 * (-1 if self.vel > 0 else 1)
+                self.ac = 4/60 * (-1 if self.vel > 0 else 1)
         
         if not int( self.vel ) == 0:
             if pyxel.btn(pyxel.KEY_RIGHT):
@@ -88,11 +88,12 @@ class Car:
         self.angle %= 2*math.pi
 
         self.vel += self.ac
+        print(self.vel)
 
         if abs( self.vel ) < 0.01:
             self.vel = 0
-        elif self.vel < -10:
-            self.vel = -10
+        elif self.vel < -15:
+            self.vel = -15
 
         self.x += 0.1* self.vel*math.cos(self.angle)
         self.y -= 0.1* self.vel*math.sin(self.angle)
@@ -125,6 +126,17 @@ class Car:
     def move_y(self, e):
         self.y += e
 
+class HUD:
+    def draw(self, car):
+        VEL_POS = (40, 200)
+        pyxel.circ(VEL_POS[0], VEL_POS[1], 30, 0)
+        pyxel.circb(VEL_POS[0], VEL_POS[1], 31, 7)
+        if (car.vel >= 0) or ( abs(car.vel) < 1 ):
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+(math.pi/200*car.vel)), 8)
+        else:
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+abs(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+abs(math.pi/200*car.vel)), 8)
+            pyxel.text(VEL_POS[0]+10, VEL_POS[1] - 20, "R", 8)
+
 class BackGround:
     def __init__(self):
         self.horizontal = []
@@ -134,6 +146,7 @@ class BackGround:
                 [
                     [i*20,0],
                     [i*20,HEIGHT]
+
                 ]
             )
         for i in range(1, int(HEIGHT/10)):
@@ -199,6 +212,7 @@ class App:
         self.car = Car((WIDTH/2, HEIGHT/2))
         self.floor = BackGround()
         self.camera = Camera()
+        self.hud = HUD()
 
         pyxel.init(WIDTH, HEIGHT, caption='Gran Rutismo', fps=60)
         pyxel.load("./my_resource.pyxres")
@@ -211,5 +225,6 @@ class App:
     def draw(self):
         self.floor.draw()
         self.car.draw()
+        self.hud.draw(self.car)
 
 App()
