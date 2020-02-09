@@ -122,32 +122,33 @@ class Car:
         self.sprites[to_draw][0].draw(self.x - self.sprites[to_draw][1][0], self.y- self.sprites[to_draw][1][1])
     
     def move_x(self, e):
-        x += e
+        self.x += e
     
     def move_y(self, e):
-        y += e
+        self.y += e
 
 class BackGround:
     def __init__(self):
-        self.a = []
-        for i in range(1, int(HEIGHT/10)):
-            self.a.append(
-                (
-                    (i*20,0),
-                    (i*20,HEIGHT)
-                )
+        self.horizontal = []
+        self.vertical = []
+        for i in range(1, int(HEIGHT/14)):
+            self.vertical.append(
+                [
+                    [i*20,0],
+                    [i*20,HEIGHT]
+                ]
             )
         for i in range(1, int(HEIGHT/10)):
-            self.a.append(
-                (
-                    (0, i*20),
-                    (WIDTH, i*20)
-                )
+            self.horizontal.append(
+                [
+                    [0, i*20],
+                    [WIDTH, i*20]
+                ]
             )
 
     def draw(self):
         pyxel.cls(0)
-        for i in self.a:
+        for i in self.vertical + self.horizontal:
             pyxel.line(
                 i[0][0],
                 i[0][1],
@@ -157,33 +158,50 @@ class BackGround:
             )
     
     def move_x(self, e):
-        for i in self.a:
-            i[0] += e
-            i[0] %= WIDTH
+        new = []
+        for i in self.vertical:
+            new.append(
+                [
+                [(i[0][0] + e)%WIDTH, i[0][1]],
+                [(i[1][0] + e)%WIDTH, i[1][1]]
+                ]
+            )
+        self.vertical = new
+            
     
     def move_y(self, e):
-        for i in self.a:
-            i[1] += e
-            i[1] %= HEIGHT
+        new = []
+        for i in self.horizontal:
+            new.append( 
+                [
+                [i[0][0], (i[0][1]+e)%HEIGHT],
+                [i[1][0], (i[1][1]+e)%HEIGHT]
+                ]
+            )
+        self.horizontal = new
 
 class Camera:
     def __init__(self):
-        self.ac_x = 0
-        self.ac_y = 0
+        self.vel_x = 0
+        self.vel_y = 0
 
-    def update(self, car, *items):
+    def update(self, car, items):
+        print(car.x, car.y)
         if (car.x != WIDTH/2):
-            self.ac_x = (WIDTH/2 - car.x)(0.6*0.6)
+            self.vel_x = (WIDTH/2 - car.x)*0.002*abs(int(car.vel))
         if (car.y != HEIGHT/2):
-            self.ac_y = (WIDTH/2 - car.y)(0.6*0.6)
+            self.vel_y = (HEIGHT/2 - car.y)*0.002*abs(int(car.vel))
         
         for i in [car] + items:
+            i.move_x(self.vel_x) 
+            i.move_y(self.vel_y)
 
 
 class App:
     def __init__(self):
         self.car = Car((WIDTH/2, HEIGHT/2))
         self.floor = BackGround()
+        self.camera = Camera()
 
         pyxel.init(WIDTH, HEIGHT, caption='Gran Rutismo', fps=60)
         pyxel.load("./my_resource.pyxres")
@@ -191,6 +209,7 @@ class App:
     
     def update(self):
         self.car.update()
+        self.camera.update(self.car, [self.floor])
 
     def draw(self):
         self.floor.draw()
