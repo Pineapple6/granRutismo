@@ -87,8 +87,6 @@ class Car:
 
         self.angle %= 2*math.pi
 
-        print(self.vel)
-
         self.vel += self.ac
 
         if abs( self.vel ) < 0.01:
@@ -186,7 +184,6 @@ class Camera:
         self.vel_y = 0
 
     def update(self, car, items):
-        print(car.x, car.y)
         if (car.x != WIDTH/2):
             self.vel_x = (WIDTH/2 - car.x)*0.002*abs(int(car.vel))
         if (car.y != HEIGHT/2):
