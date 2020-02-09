@@ -33,6 +33,8 @@ class Car:
        self.x = coords[0]
        self.y = coords[1]
        self.vel = 0
+       self.fuel = 40
+       self.waste_each_100 = 4.1
        self.angle = math.pi/2
        self.ac = 0
        self.sprites = {
@@ -71,13 +73,22 @@ class Car:
        }
 
     def update(self):
-        if pyxel.btn(pyxel.KEY_UP):
-            self.ac = 10/12000 * abs(210 - self.vel)
+        if self.fuel < 0:
+            self.fuel = 0
+
+        if pyxel.btn(pyxel.KEY_UP) and self.fuel > 0:
+            self.ac = (10/12000 * abs(210 - self.vel))
+            self.fuel -= abs( self.vel*0.1*4.1/100 )
         elif pyxel.btn(pyxel.KEY_DOWN):
-            self.ac = -30/60
-        else:
-            if self.vel != 0:
-                self.ac = 4/60 * (-1 if self.vel > 0 else 1)
+            if int(self.vel) > 0:
+                self.ac = -30/60
+            elif self.fuel > 0:
+                self.ac = -30/60
+                self.fuel -= abs( self.vel*0.1*4.1/100 )
+            else:
+                self.ac = 0
+        elif self.vel != 0:
+            self.ac = 4/60 * (-1 if self.vel > 0 else 1)
         
         if not int( self.vel ) == 0:
             if pyxel.btn(pyxel.KEY_RIGHT):
@@ -88,7 +99,8 @@ class Car:
         self.angle %= 2*math.pi
 
         self.vel += self.ac
-        print(self.vel)
+
+        print(int( self.vel ), self.fuel)
 
         if abs( self.vel ) < 0.01:
             self.vel = 0
