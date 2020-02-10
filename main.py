@@ -78,13 +78,13 @@ class Car:
 
         if pyxel.btn(pyxel.KEY_UP) and self.fuel > 0:
             self.ac = (10/12000 * abs(210 - self.vel))
-            self.fuel -= abs( 0.1*self.waste_each_100/100/(self.vel/10 if self.vel > 0 else 1) )
+            self.fuel -= abs( 0.1*self.waste_each_100/100/(self.vel/10 if self.vel >= 10 else 1) )
         elif pyxel.btn(pyxel.KEY_DOWN):
             if int(self.vel) > 0:
                 self.ac = -30/60
             elif self.fuel > 0:
                 self.ac = -30/60
-                self.fuel -= abs( 0.1*self.waste_each_100/100/(self.vel/10 if self.vel > 0 else 1) )
+                self.fuel -= abs( 0.1*self.waste_each_100/100)
             else:
                 self.ac = 0
         elif self.vel != 0:
@@ -138,7 +138,7 @@ class Car:
     def move_y(self, e):
         self.y += e
 
-class HUD:
+class CarHUD:
     def draw(self, car):
         VEL_POS = (40, 200)
         GAS_POS = (90, 200)
@@ -240,7 +240,7 @@ class App:
         self.car = Car((WIDTH/2, HEIGHT/2))
         self.floor = BackGround()
         self.camera = Camera()
-        self.hud = HUD()
+        self.hud = CarHUD()
 
         pyxel.init(WIDTH, HEIGHT, caption='Gran Rutismo', fps=60)
         pyxel.load("./my_resource.pyxres")
