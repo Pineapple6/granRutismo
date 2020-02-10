@@ -22,7 +22,7 @@ class Car:
        self.x = coords[0]
        self.y = coords[1]
        self.vel = 0
-       self.fuel = 40
+       self.fuel = 10
        self.waste_each_100 = 4.1
        self.angle = math.pi/2
        self.ac = 0
@@ -89,7 +89,7 @@ class Car:
 
         self.vel += self.ac
 
-        print(int( self.vel ), self.fuel)
+        #print('VEL:', int( self.vel ), 'FUEL:', self.fuel)
 
         if abs( self.vel ) < 0.01:
             self.vel = 0
@@ -148,11 +148,18 @@ class CarHUD:
 
         pyxel.circ(VEL_POS[0], VEL_POS[1], 30, 0)
         pyxel.circb(VEL_POS[0], VEL_POS[1], 31, 7)
+        pyxel.text(VEL_POS[0]-28, VEL_POS[1] - 6, "0", 7)
+        pyxel.text(VEL_POS[0]-25, VEL_POS[1] - 15, "30", 7)
+        pyxel.text(VEL_POS[0]-15, VEL_POS[1] - 25, "70", 7)
+        pyxel.text(VEL_POS[0]-2, VEL_POS[1] - 28, "130", 7)
+        pyxel.text(VEL_POS[0]+10, VEL_POS[1] - 22, "150", 7)
+        pyxel.text(VEL_POS[0]+10, VEL_POS[1] - 22, "180", 7)
+        pyxel.text(VEL_POS[0]+15, VEL_POS[1] - 10, "210", 7)
         if (car.vel >= 0) or ( abs(car.vel) < 1 ):
-            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+0.1+(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+(math.pi/200*car.vel)), 8)
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 20*math.cos(math.pi+0.1+(math.pi/250*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+(math.pi/250*car.vel)), 8)
         else:
-            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 25*math.cos(math.pi+0.1+abs(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+abs(math.pi/200*car.vel)), 8)
-            pyxel.text(VEL_POS[0]+13, VEL_POS[1] - 23, "R", 8)
+            pyxel.line(VEL_POS[0], VEL_POS[1], VEL_POS[0] + 20*math.cos(math.pi+0.1+abs(math.pi/200*car.vel)), VEL_POS[1] + 25*math.sin(math.pi+0.1+abs(math.pi/200*car.vel)), 8)
+            pyxel.text(VEL_POS[0]+5, VEL_POS[1] - 10, "R", 8)
 
 class BackGround:
     def __init__(self):
