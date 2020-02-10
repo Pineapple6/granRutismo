@@ -4,17 +4,6 @@ import math
 HEIGHT = 200
 WIDTH = 250
 
-# HIELO --> 0.1
-# ASFALTO --> 0.8
-FRICTION_CONSTANT = 0.8
-
-# CV
-# 1300 --> superdeportivo
-# 60-100 --> seat ibiza
-
-# Aceleración
-# 1940 cv --> 0 a 100 en 1.85 s
-
 class Sprite:
     def __init__(self, bank, start_coords, end_coords, col):
         self.start_coords = start_coords
